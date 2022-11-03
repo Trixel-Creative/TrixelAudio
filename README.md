@@ -2,7 +2,11 @@
 
 TrixelAudio is an open-source, robust and feature-rich sound effects and background music system for Unity. It uses a ScriptableObject-based architecture and can be easily brought into any existing Unity project. TrixelAudio is the core framework for all sound-related features in the [Restitched](https://trixelcreative.com/Restitched) game by Trixel Creative.
 
-## Contributing
+## Features
+
+ - **Scene-independent:** The TrixelAudio Core can be initialized during game startup and will not destroy itself until the game is shut down.
+ - **Built-in Audio Source pool**: We've implemented an AudioSource pool for you so you don't have to. That way, you do not need to manage activating and deactivating Unity audio sources.## Contributing
+ - **Sound Banks:** Group related sound effects together into Sound Bank assets to create music playlists, random sound cues, and more.
 
 If you feel TrixelAudio is missing a feature, feel free to fork it and submit a pull request! This project is maintained with <3 by [Michael (acidiclight)](https://github.com/acidiclight).
 
