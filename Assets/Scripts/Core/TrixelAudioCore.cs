@@ -45,6 +45,9 @@ namespace TrixelCreative.TrixelAudio
                 sourceTransform.position = soundTransform.position;
                 sourceTransform.rotation = soundTransform.rotation;
 
+                // Assign the mixer group
+                source.outputAudioMixerGroup = this.configuration.SoundEffectsMixer;
+                
                 // Play the sound
                 sound.PlayOnAudioSource(source);
             }
