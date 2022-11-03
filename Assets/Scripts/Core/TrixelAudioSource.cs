@@ -19,5 +19,10 @@ namespace TrixelCreative.TrixelAudio
 		{
 			core.Play(sound, this.transform);
 		}
+
+		public void PlaySong(SongAsset song, bool loop = false)
+		{
+			core.PlaySongAsset(song, loop);
+		}
 	}
 }

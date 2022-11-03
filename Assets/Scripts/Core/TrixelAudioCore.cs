@@ -7,7 +7,8 @@ namespace TrixelCreative.TrixelAudio
 {
     public class TrixelAudioCore : MonoBehaviour
     {
-        private AudioSourcePool soundEffectPool;
+        private AudioSourcePool soundEffectPool = null!;
+        private SongPlayerCore songPlayer = null!;
 
         [Header("Configuration")]
         [SerializeField]
@@ -22,7 +23,10 @@ namespace TrixelCreative.TrixelAudio
             DontDestroyOnLoad(this);
 
             // Initialize the sound effect pool
-            soundEffectPool = new AudioSourcePool(this, configuration.SoundEffectPoolSize);
+            soundEffectPool = new AudioSourcePool(this, configuration.SoundEffectPoolSize, "Sfx");
+            
+            // Initialize the song player
+            this.songPlayer = new SongPlayerCore(this, configuration);
         }
 
         private void Start()
@@ -34,6 +38,7 @@ namespace TrixelCreative.TrixelAudio
         private void Update()
         {
             soundEffectPool.ReclaimUnusedAudioSources();
+            this.songPlayer.Update();
         }
 
         public void Play(SoundEffectAsset sound, Transform soundTransform)
@@ -66,6 +71,11 @@ namespace TrixelCreative.TrixelAudio
 
             pooledSource = attempt;
             return true;
+        }
+
+        public void PlaySongAsset(SongAsset song, bool loop = false)
+        {
+            this.songPlayer.Play(song, loop);
         }
     }
 }

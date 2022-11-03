@@ -10,10 +10,12 @@ namespace TrixelCreative.TrixelAudio
 		private readonly TrixelAudioCore core;
 		private readonly AudioSource[] pool = Array.Empty<AudioSource>();
 		private int highestAcquiredIndex = -1;
+		private readonly string poolName;
 
-		public AudioSourcePool(TrixelAudioCore core, int poolSize)
+		public AudioSourcePool(TrixelAudioCore core, int poolSize, string poolName)
 		{
 			this.core = core;
+			this.poolName = poolName;
 			
 			Assert.IsFalse(poolSize < 1, "[TrixelAudio] Sound effect pool size is below 1.");
 			
@@ -37,7 +39,7 @@ namespace TrixelCreative.TrixelAudio
 				
 				// No existing source in this slot, create one
 				// We start the object as inactive, we'll activate it when we need it.
-				GameObject go = new GameObject($"TrixelAudio Sound Effect Pool Object [{i}]");
+				GameObject go = new GameObject($"{poolName} Pool Object [{i}]");
 				go.SetActive(false);
 				go.transform.SetParent(core.gameObject.transform);
 				existing = go.AddComponent<AudioSource>();
