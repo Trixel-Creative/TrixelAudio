@@ -50,7 +50,7 @@ namespace TrixelCreative.TrixelAudio
 		public void ReclaimUnusedAudioSources()
 		{
 			int lastStillPlaying = -1;
-			for (var i = 0; i < highestAcquiredIndex; i++)
+			for (var i = 0; i <= highestAcquiredIndex; i++)
 			{
 				AudioSource source = pool[i];
 				if (!source.gameObject.activeSelf)
