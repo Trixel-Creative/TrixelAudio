@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿using System;
+using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -7,8 +8,8 @@ namespace TrixelCreative.TrixelAudio
 	public class AudioSourcePool
 	{
 		private readonly TrixelAudioCore core;
-		private readonly AudioSource[] pool;
-		private readonly bool[] used;
+		private readonly AudioSource[] pool = Array.Empty<AudioSource>();
+		private int highestAcquiredIndex = -1;
 
 		public AudioSourcePool(TrixelAudioCore core, int poolSize)
 		{
@@ -22,6 +23,8 @@ namespace TrixelCreative.TrixelAudio
 
 		public void Initialize()
 		{
+			highestAcquiredIndex = -1;
+			
 			for (var i = 0; i < pool.Length; i++)
 			{
 				// Consume any existing AudioSources if they're not destroyed.
@@ -44,14 +47,25 @@ namespace TrixelCreative.TrixelAudio
 
 		public void ReclaimUnusedAudioSources()
 		{
-			for (var i = 0; i < pool.Length; i++)
+			int lastStillPlaying = -1;
+			for (var i = 0; i < highestAcquiredIndex; i++)
 			{
 				AudioSource source = pool[i];
 				if (!source.gameObject.activeSelf)
 					continue;
-				
+
 				if (!source.isPlaying)
+				{
 					source.gameObject.SetActive(false);
+					if (highestAcquiredIndex <= i)
+					{
+						highestAcquiredIndex = lastStillPlaying;
+					}
+				}
+				else
+				{
+					lastStillPlaying = i;
+				}
 			}
 		}
 		
@@ -63,6 +77,8 @@ namespace TrixelCreative.TrixelAudio
 				if (!source.gameObject.activeInHierarchy)
 				{
 					source.gameObject.SetActive(true);
+					if (i >= highestAcquiredIndex)
+						highestAcquiredIndex = i;
 					return source;
 				}
 			}
