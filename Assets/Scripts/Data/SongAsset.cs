@@ -17,6 +17,8 @@ namespace TrixelCreative.TrixelAudio.Data
 		public string Title => songTitle;
 		public string Artist => artist;
 
+		public float Length => this.audioClip != null ? this.audioClip.length : 0f;
+		
 		internal void Setup(AudioSource audioSource)
 		{
 			if (this.audioClip == null)

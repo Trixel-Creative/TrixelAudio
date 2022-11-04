@@ -73,9 +73,9 @@ namespace TrixelCreative.TrixelAudio
             return true;
         }
 
-        public void PlaySongAsset(SongAsset song, bool loop = false)
+        public SongPlayerState PlaySongAsset(SongAsset song, bool loop = false)
         {
-            this.songPlayer.Play(song, loop);
+            return this.songPlayer.Play(song, loop);
         }
     }
 }

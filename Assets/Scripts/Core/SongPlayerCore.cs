@@ -1,6 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
 using TrixelCreative.TrixelAudio.Data;
-using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -12,6 +11,8 @@ namespace TrixelCreative.TrixelAudio
 		private readonly CoreConfiguration configuration;
 		private readonly AudioSourcePool pool;
 
+		private SongPlayerStateInternal? currentSongState;
+		private SongPlayerStateInternal? nextSongState;
 		private AudioSource? currentSource;
 		private SongAsset? currentSong;
 		private SongAsset? nextSong;
@@ -36,21 +37,43 @@ namespace TrixelCreative.TrixelAudio
 			if (nextSong != null)
 			{
 				Stop();
+				currentSongState = nextSongState;
+				nextSongState = null;
 				PlayInternal(nextSong, nextSongLoops);
+				nextSong = null;
 			}
 
 			// In case a non-looping song ends without an explicit Stop call.
 			pool.ReclaimUnusedAudioSources();
 			
-			// If our current audio source has been reclaimed above, we must lose the reference!!
-			if (this.currentSource != null && !this.currentSource.gameObject.activeSelf)
+			// Update the state of the current song (set its position), after checking
+			// to see if the song has ended.
+			if (this.currentSource != null)
 			{
-				this.currentSong = null;
-				this.currentSource = null;
+				if (!this.currentSource.gameObject.activeSelf)
+				{
+					// Song has ended but Stop() wasn't called, report that the song has stopped
+					if (currentSongState != null)
+					{
+						this.currentSongState.SetPlaybackState(PlaybackState.Stopped);
+						this.currentSongState.ClearInvocationLists();
+						this.currentSongState = null;
+					}
+					
+					// Give away our pooled reference
+					this.currentSong = null;
+					this.currentSource = null;
+				}
+				else
+				{
+					// Update the song position
+					if (this.currentSongState != null)
+						this.currentSongState.SetPosition(this.currentSource.time);
+				}
 			}
 		}
 
-		public void Play(SongAsset song, bool loop)
+		public SongPlayerState Play(SongAsset song, bool loop)
 		{
 			// Force-stops the current song if we're paused, this prevents an awkward fade when fading is added.
 			if (currentSource != null && isPaused)
@@ -63,16 +86,26 @@ namespace TrixelCreative.TrixelAudio
 			{
 				nextSong = song;
 				nextSongLoops = loop;
-				return;
+				this.nextSongState = new SongPlayerStateInternal(song, this);
+				return new SongPlayerState(this.nextSongState);
 			}
 
+			this.currentSongState = new SongPlayerStateInternal(song, this);
 			PlayInternal(song, loop);
+			return new SongPlayerState(this.currentSongState);
 		}
 
 		public void Stop()
 		{
 			if (currentSource != null)
 				currentSource.Stop();
+
+			if (currentSongState != null)
+			{
+				currentSongState.SetPlaybackState(PlaybackState.Stopped);
+				currentSongState.ClearInvocationLists();
+				currentSongState = null;
+			}
 			
 			isPaused = false;
 			pool.ReclaimUnusedAudioSources();
@@ -90,11 +123,97 @@ namespace TrixelCreative.TrixelAudio
 
 			if (currentSource != null)
 			{
+				if (currentSongState != null)
+				{
+					currentSongState.SetPosition(0);
+					currentSongState.SetPlaybackState(PlaybackState.Playing);
+				}
+
 				currentSource.loop = loop;
 				currentSource.spatialBlend = 0;
 				currentSource.outputAudioMixerGroup = this.configuration.MusicMixer;
 				song.Setup(currentSource);
 			}
 		}
+
+		private void NotifyStopRequested(SongPlayerStateInternal internalState)
+		{
+			if (internalState == currentSongState)
+			{
+				this.Stop();
+				return;
+			}
+
+			if (internalState == nextSongState)
+			{
+				nextSongState = null;
+				internalState.SetPlaybackState(PlaybackState.Stopped);
+				internalState.ClearInvocationLists();
+			}
+		}
+
+		internal class SongPlayerStateInternal
+		{
+			private PlaybackState playbackState;
+			private readonly SongPlayerCore core;
+
+			public PlaybackState PlaybackState => playbackState;
+			public float Length { get; private set; }
+			public float Position { get; private set; } = 0;
+
+			public event Action? Stopped;
+			public event Action<PlaybackState>? PlaybackStateChanged;
+
+			internal SongPlayerStateInternal(SongAsset song, SongPlayerCore core)
+			{
+				this.Length = song.Length;
+				this.core = core;
+			}
+
+			internal void ClearInvocationLists()
+			{
+				PlaybackStateChanged = null;
+				Stopped = null;
+			}
+
+			internal void SetPosition(float position)
+			{
+				this.Position = position;
+			}
+
+			internal void SetPlaybackState(PlaybackState newState)
+			{
+				if (newState != this.playbackState)
+				{
+					this.playbackState = newState;
+					this.OnPlaybackStateChange();
+				}
+			}
+
+			private void OnPlaybackStateChange()
+			{
+				this.PlaybackStateChanged?.Invoke(this.playbackState);
+
+				switch (this.playbackState)
+				{
+					case TrixelAudio.PlaybackState.Stopped:
+						Stopped?.Invoke();
+						break;
+				}
+			}
+
+			internal void RequestStop()
+			{
+				core.NotifyStopRequested(this);
+			}
+		}
+	}
+
+	public enum PlaybackState
+	{
+		NotStarted,
+		Playing,
+		Paused,
+		Stopped
 	}
 }

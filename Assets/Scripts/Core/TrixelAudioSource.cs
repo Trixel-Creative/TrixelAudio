@@ -20,9 +20,9 @@ namespace TrixelCreative.TrixelAudio
 			core.Play(sound, this.transform);
 		}
 
-		public void PlaySong(SongAsset song, bool loop = false)
+		public SongPlayerState PlaySong(SongAsset song, bool loop = false)
 		{
-			core.PlaySongAsset(song, loop);
+			return core.PlaySongAsset(song, loop);
 		}
 	}
 }
