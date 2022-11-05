@@ -11,6 +11,8 @@ namespace TrixelCreative.TrixelAudio
 		private readonly CoreConfiguration configuration;
 		private readonly AudioSourcePool pool;
 
+		private bool hasStartedNextSong = false;
+		private SongPlayerOptions? nextSongOptions;
 		private SongPlayerStateInternal? currentSongState;
 		private SongPlayerStateInternal? nextSongState;
 		private AudioSource? currentSource;
@@ -33,14 +35,10 @@ namespace TrixelCreative.TrixelAudio
 			if (isPaused)
 				return;
 			
-			// TODO: Fading
-			if (nextSong != null)
+			if (nextSong != null && !hasStartedNextSong)
 			{
-				Stop();
-				currentSongState = nextSongState;
-				nextSongState = null;
-				PlayInternal(nextSong, nextSongLoops);
-				nextSong = null;
+				StartNextSong();
+				return;
 			}
 
 			// In case a non-looping song ends without an explicit Stop call.
@@ -73,8 +71,22 @@ namespace TrixelCreative.TrixelAudio
 			}
 		}
 
-		public SongPlayerState Play(SongAsset song, bool loop)
+		private void StartNextSong()
 		{
+			if (nextSong != null)
+			{
+				Stop();
+				currentSongState = nextSongState;
+				nextSongState = null;
+				PlayInternal(nextSong, nextSongLoops);
+				nextSong = null;
+			}
+		}
+
+		public SongPlayerState Play(SongAsset song, bool loop, SongPlayerOptions? options = null)
+		{
+			options ??= new SongPlayerOptions();
+			
 			// Force-stops the current song if we're paused, this prevents an awkward fade when fading is added.
 			if (currentSource != null && isPaused)
 			{
@@ -84,6 +96,7 @@ namespace TrixelCreative.TrixelAudio
 			// TODO: Fade times
 			if (currentSong != null)
 			{
+				nextSongOptions = options;
 				nextSong = song;
 				nextSongLoops = loop;
 				this.nextSongState = new SongPlayerStateInternal(song, this);
@@ -208,12 +221,10 @@ namespace TrixelCreative.TrixelAudio
 			}
 		}
 	}
-
-	public enum PlaybackState
+	
+	public class SongPlayerOptions
 	{
-		NotStarted,
-		Playing,
-		Paused,
-		Stopped
+		public bool UseCrossFade { get; set; }
+		public float CrossFadeTime { get; set; }
 	}
 }
