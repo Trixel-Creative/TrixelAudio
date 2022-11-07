@@ -1,4 +1,4 @@
-# TrixelAudio
+![TrixelAudio](/Branding/TrixelAudio_Logo_Dark.png)
 
 TrixelAudio is an open-source, robust and feature-rich sound effects and background music system for Unity. It uses a ScriptableObject-based architecture and can be easily brought into any existing Unity project. TrixelAudio is the core framework for all sound-related features in the [Restitched](https://trixelcreative.com/Restitched) game by Trixel Creative.
 
