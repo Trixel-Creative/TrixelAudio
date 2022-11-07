@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using TrixelCreative.TrixelAudio.Data;
 using TrixelCreative.TrixelAudio.Utility;
 using UnityEngine;
@@ -9,8 +10,17 @@ namespace TrixelCreative.TrixelAudio.Music
 {
 	public class RandomMusicPlayer : MonoBehaviour, IJukebox
 	{
+		private bool isWaitingForDelay = false;
+		
 		[SerializeField]
 		private PlaylistAsset playlist = null!;
+
+		[Header("Playlist Delays")]
+		[SerializeField]
+		private float minimumDelayBetweenTracks = 0f;
+
+		[SerializeField]
+		private float maximumDelayBetweenTracks = 0f;
 		
 		private TrixelAudioSource audioSource = null!;
 		private SongAsset? currentlyPlayingSong = null;
@@ -49,7 +59,7 @@ namespace TrixelCreative.TrixelAudio.Music
 			currentlyPlayingSong = null;
 			
 			// Play the next song.
-			this.PlayNextSong();
+			StartCoroutine(DelayPlayback());
 		}
 
 		private void PlayNextSong()
@@ -70,8 +80,10 @@ namespace TrixelCreative.TrixelAudio.Music
 		/// <inheritdoc />
 		public void Play()
 		{
-			// TODO: Pausing support
-			PlayNextSong();
+			if (isWaitingForDelay)
+				return;
+
+			StartCoroutine(DelayPlayback());
 		}
 
 		/// <inheritdoc />
@@ -88,6 +100,15 @@ namespace TrixelCreative.TrixelAudio.Music
 			}
 
 			currentlyPlayingSong = null;
+		}
+
+		private IEnumerator DelayPlayback()
+		{
+			isWaitingForDelay = true;
+			float time = Random.Range(minimumDelayBetweenTracks, maximumDelayBetweenTracks);
+			yield return new WaitForSeconds(time);
+			isWaitingForDelay = false;
+			PlayNextSong();
 		}
 	}
 }
