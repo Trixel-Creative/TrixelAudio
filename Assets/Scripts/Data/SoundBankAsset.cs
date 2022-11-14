@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace TrixelCreative.TrixelAudio.Data
 {
@@ -13,6 +14,16 @@ namespace TrixelCreative.TrixelAudio.Data
 
 		[SerializeField]
 		private SoundEffectAsset[] soundEffects = Array.Empty<SoundEffectAsset>();
+
+		public bool TryGetRandomSound(out SoundEffectAsset sound)
+		{
+			sound = null!;
+			if (this.soundEffects.Length == 0)
+				return false;
+
+			sound = this.soundEffects[Random.Range(0, this.soundEffects.Length)];
+			return true;
+		}
 		
 #if UNITY_EDITOR
 
