@@ -1,4 +1,5 @@
-﻿#nullable enable
+﻿#if UNITY_EDITOR
+#nullable enable
 using System;
 using TrixelCreative.TrixelAudio.Data;
 using UnityEditor;
@@ -28,3 +29,4 @@ namespace TrixelCreative.TrixelAudio.Editor.CustomInspectors
 		}
 	}
 }
+#endif
