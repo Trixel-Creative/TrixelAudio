@@ -25,6 +25,16 @@ namespace TrixelCreative.TrixelAudio.Data
 			return true;
 		}
 		
+		public SoundEffectAsset TryGetRandomSound()
+		{
+			//SoundEffectAsset sound = null!;
+			if (this.soundEffects.Length == 0)
+				return null;
+
+			return this.soundEffects[Random.Range(0, this.soundEffects.Length)];
+			//return sound;
+		}
+		
 #if UNITY_EDITOR
 
 		[Header("Import Sound Effects")]
