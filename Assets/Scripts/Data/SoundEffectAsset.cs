@@ -7,10 +7,10 @@ namespace TrixelCreative.TrixelAudio.Data
     public class SoundEffectAsset : ScriptableObject
     {
         [SerializeField]
-        private string soundEffectName;
+        private string soundEffectName = string.Empty;
 
         [SerializeField]
-        private AudioClip audioClip;
+        private AudioClip? audioClip;
 
         [SerializeField]
         [Range(0, 1)]

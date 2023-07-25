@@ -10,7 +10,7 @@ namespace TrixelCreative.TrixelAudio.Data
 	public class SoundBankAsset : ScriptableObject
 	{
 		[SerializeField]
-		private string soundBankName;
+		private string soundBankName = string.Empty;
 
 		[SerializeField]
 		private SoundEffectAsset[] soundEffects = Array.Empty<SoundEffectAsset>();
@@ -25,9 +25,9 @@ namespace TrixelCreative.TrixelAudio.Data
 			return true;
 		}
 		
-		public SoundEffectAsset TryGetRandomSound()
+		public SoundEffectAsset? TryGetRandomSound()
 		{
-			//SoundEffectAsset sound = null!;
+			// SoundEffectAsset sound = null!;
 			if (this.soundEffects.Length == 0)
 				return null;
 
@@ -39,7 +39,7 @@ namespace TrixelCreative.TrixelAudio.Data
 
 		[Header("Import Sound Effects")]
 		[SerializeField]
-		private string assetFolder;
+		private string assetFolder = string.Empty;
 
 		public void Reimport()
 		{
@@ -81,6 +81,8 @@ namespace TrixelCreative.TrixelAudio.Data
 			}
 
 			this.soundEffects = collectedAssets.ToArray();
+
+			EditorUtility.SetDirty(this);
 		}
 
 #endif
