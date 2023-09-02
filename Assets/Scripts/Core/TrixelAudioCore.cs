@@ -13,6 +13,8 @@ namespace TrixelCreative.TrixelAudio
         [Header("Configuration")]
         [SerializeField]
         private CoreConfiguration configuration = null!;
+
+        public CoreConfiguration Configuration => configuration;
         
         private void Awake()
         {
@@ -41,24 +43,33 @@ namespace TrixelCreative.TrixelAudio
             this.songPlayer.Update();
         }
 
-        public void Play(SoundEffectAsset sound, Transform soundTransform)
+        public void Play(SoundEffectAsset sound, Transform? soundTransform = null)
         {
-            if (TryAcquireAudioSource(out AudioSource source))
+            if (!TryAcquireAudioSource(out AudioSource source)) 
+                return;
+            
+            // Move the audio source to the same world location as the object requesting us to play
+            if (soundTransform != null)
             {
-                // Move the audio source to the same world location as the object requesting us to play
                 Transform sourceTransform = source.transform;
                 sourceTransform.position = soundTransform.position;
                 sourceTransform.rotation = soundTransform.rotation;
 
-                // Assign the mixer group
-                source.outputAudioMixerGroup = this.configuration.SoundEffectsMixer;
-                
-                // Play the sound
-                sound.PlayOnAudioSource(source);
+                source.spatialize = true;
             }
+            else
+            {
+                source.spatialize = false;
+            }
+
+            // Assign the mixer group
+            source.outputAudioMixerGroup = this.configuration.SoundEffectsMixer;
+                
+            // Play the sound
+            sound.PlayOnAudioSource(source);
         }
 
-        private bool TryAcquireAudioSource(out AudioSource pooledSource)
+        public bool TryAcquireAudioSource(out AudioSource pooledSource)
         {
             pooledSource = null!;
             

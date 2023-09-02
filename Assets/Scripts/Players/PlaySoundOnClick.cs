@@ -1,11 +1,13 @@
 ﻿#nullable enable
 
+using System;
 using TrixelCreative.TrixelAudio.Data;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace TrixelCreative.TrixelAudio.Players
 {
+	[Obsolete]
 	public class PlaySoundOnClick :
 		AudioPlayerBase,
 		IPointerClickHandler

@@ -9,6 +9,8 @@ namespace TrixelCreative.TrixelAudio
 	{
 		private TrixelAudioCore core = null!;
 
+		public TrixelAudioCore AudioCore => core;
+		
 		private void Awake()
 		{
 			core = FindObjectOfType<TrixelAudioCore>();

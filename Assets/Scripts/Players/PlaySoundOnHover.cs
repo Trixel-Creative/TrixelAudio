@@ -6,6 +6,7 @@ using UnityEngine.EventSystems;
 
 namespace TrixelCreative.TrixelAudio.Players
 {
+	[Obsolete]
 	public class PlaySoundOnHover :
 		AudioPlayerBase,
 		IPointerEnterHandler

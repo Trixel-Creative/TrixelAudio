@@ -24,13 +24,20 @@ namespace TrixelCreative.TrixelAudio.Data
 		[SerializeField]
 		private AudioMixerGroup dialogueGroup = null!;
 
+		[Header("UI")]
+		[SerializeField]
+		[Tooltip("Choose a User Interface Sound Scheme asset to use for user interface navigation sounds.")]
+		private UserInterfaceSoundSchemeAsset uiSoundScheme = null!;
+		
 		public AudioMixerGroup SoundEffectsMixer => soundEffectsGroup;
 		public AudioMixerGroup MusicMixer => musicGroup;
 		public AudioMixerGroup AmbienceMixer => ambienceGroup;
 		public AudioMixerGroup DialogueMixer => dialogueGroup;
 
 		public int SoundEffectPoolSize => soundEffectPoolSize;
-        
+
+		public UserInterfaceSoundSchemeAsset? UserInterfaceSoundScheme => uiSoundScheme;
+		
 		private void OnValidate()
 		{
 			if (soundEffectPoolSize < 1)
