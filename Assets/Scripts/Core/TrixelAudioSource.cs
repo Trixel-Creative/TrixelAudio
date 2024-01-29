@@ -7,24 +7,51 @@ namespace TrixelCreative.TrixelAudio
 {
 	public class TrixelAudioSource : MonoBehaviour
 	{
-		private TrixelAudioCore core = null!;
+		private TrixelAudioCore? core = null!;
 
-		public TrixelAudioCore AudioCore => core;
+		public TrixelAudioCore? AudioCoreOld  => core;
 		
 		private void Awake()
 		{
 			core = FindObjectOfType<TrixelAudioCore>();
-			Assert.IsNotNull(core, "[TrixelAudio] Cannot find TrixelAudioCore, this audio source will not function.");
+			if (core == null)
+				Debug.LogWarning("[TrixelAudio] TrixelAudioCore was not found in any active scene. Sound will not work.");
 		}
 
 		public void Play(SoundEffectAsset sound)
 		{
+			if (core == null)
+				return;
+			
 			core.Play(sound, this.transform);
 		}
 
 		public SongPlayerState PlaySong(SongAsset song, bool loop = false)
 		{
+			if (core == null)
+				return SongPlayerState.Invalid;
+			
 			return core.PlaySongAsset(song, loop);
+		}
+
+		public bool TryAcquireAudioSource(out AudioSource pooledAudioSource)
+		{
+			pooledAudioSource = null;
+
+			if (this.core == null)
+				return false;
+
+			return this.core.TryAcquireAudioSource(out pooledAudioSource);
+		}
+
+		public bool TryGetUiSounds(out UserInterfaceSoundSchemeAsset uiSounds)
+		{
+			uiSounds = default!;
+			if (core == null)
+				return false;
+
+			uiSounds = core.Configuration.UserInterfaceSoundScheme!;
+			return uiSounds != null;
 		}
 	}
 }

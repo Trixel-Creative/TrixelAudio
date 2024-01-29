@@ -4,11 +4,11 @@ namespace TrixelCreative.TrixelAudio
 {
 	public class SongPlayerState
 	{
-		private readonly SongPlayerCore.SongPlayerStateInternal internalState;
+		private readonly SongPlayerCore.SongPlayerStateInternal? internalState;
 
-		public float Length => internalState.Length;
-		public float Position => internalState.Position;
-		public PlaybackState PlaybackState => internalState.PlaybackState;
+		public float Length => internalState?.Length ?? 0;
+		public float Position => internalState?.Position ?? 0;
+		public PlaybackState PlaybackState => internalState?.PlaybackState ?? PlaybackState.Stopped;
 
 		public event Action? Stopped; 
 
@@ -18,8 +18,16 @@ namespace TrixelCreative.TrixelAudio
 			this.internalState.Stopped += HandleStoppedInternally;
 		}
 
+		private SongPlayerState()
+		{
+			this.internalState = null;
+		}
+
 		public void Stop()
 		{
+			if (this.internalState == null)
+				return;
+			
 			if (this.PlaybackState == PlaybackState.Stopped)
 				return;
 
@@ -30,5 +38,7 @@ namespace TrixelCreative.TrixelAudio
 		{
 			this.Stopped?.Invoke();
 		}
+
+		public static SongPlayerState Invalid => new SongPlayerState();
 	}
 }

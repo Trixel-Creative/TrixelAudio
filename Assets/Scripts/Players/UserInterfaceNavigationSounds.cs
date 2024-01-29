@@ -19,7 +19,7 @@ namespace TrixelCreative.TrixelAudio.Players
 			if (!TryGetUiSounds(out UserInterfaceSoundSchemeAsset uiSounds))
 				return;
 
-			if (!AudioSource.AudioCore.TryAcquireAudioSource(out AudioSource pooledSource))
+			if (!AudioSource.TryAcquireAudioSource(out AudioSource pooledSource))
 				return;
 			
 			uiSounds.PlayNavigateSound(pooledSource);
@@ -31,7 +31,7 @@ namespace TrixelCreative.TrixelAudio.Players
 			if (!TryGetUiSounds(out UserInterfaceSoundSchemeAsset uiSounds))
 				return;
 
-			if (!AudioSource.AudioCore.TryAcquireAudioSource(out AudioSource pooledSource))
+			if (!AudioSource.TryAcquireAudioSource(out AudioSource? pooledSource))
 				return;
 			
 			uiSounds.PlayNavigateSound(pooledSource);
@@ -43,7 +43,7 @@ namespace TrixelCreative.TrixelAudio.Players
 			if (!TryGetUiSounds(out UserInterfaceSoundSchemeAsset uiSounds))
 				return;
 
-			if (!AudioSource.AudioCore.TryAcquireAudioSource(out AudioSource pooledSource))
+			if (!AudioSource.TryAcquireAudioSource(out AudioSource pooledSource))
 				return;
 			
 			uiSounds.PlaySelectSound(pooledSource);
@@ -55,7 +55,7 @@ namespace TrixelCreative.TrixelAudio.Players
 			if (!TryGetUiSounds(out UserInterfaceSoundSchemeAsset uiSounds))
 				return;
 
-			if (!AudioSource.AudioCore.TryAcquireAudioSource(out AudioSource pooledSource))
+			if (!AudioSource.TryAcquireAudioSource(out AudioSource pooledSource))
 				return;
 			
 			uiSounds.PlaySelectSound(pooledSource);
@@ -63,8 +63,7 @@ namespace TrixelCreative.TrixelAudio.Players
 
 		private bool TryGetUiSounds(out UserInterfaceSoundSchemeAsset soundScheme)
 		{
-			soundScheme = this.AudioSource.AudioCore.Configuration.UserInterfaceSoundScheme!;
-			return soundScheme != null;
+			return this.AudioSource.TryGetUiSounds(out soundScheme);
 		}
 
 		/// <inheritdoc />
@@ -73,7 +72,7 @@ namespace TrixelCreative.TrixelAudio.Players
 			if (!TryGetUiSounds(out UserInterfaceSoundSchemeAsset uiSounds))
 				return;
 
-			if (!AudioSource.AudioCore.TryAcquireAudioSource(out AudioSource pooledSource))
+			if (!AudioSource.TryAcquireAudioSource(out AudioSource pooledSource))
 				return;
 			
 			uiSounds.PlayCancelSound(pooledSource);
